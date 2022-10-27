@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.SPI.Port;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -24,5 +27,13 @@ public final class Constants {
     public static final double kDriveEncoderMetersPerSecond = kDriveEncoder2Meter/60;
     public static final double kTurnEncoder2RadiansPerSecond = kTurnEncoder2Radians/60;
     public static final double kPTurning = .5;
+    }
+    public static final class SwerveSubsystemConstants{
+    
+    public static final double kDriveWidth = Units.inchesToMeters(25);
+    public static final double kDriveLength = Units.inchesToMeters(25);
+    //takes in the position of each module relative to the center of robot, order is Front Left, FrontRight, BackLeft, BackRight 
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(new Translation2d(kDriveWidth/2, -kDriveLength/2), new Translation2d(kDriveWidth/2, kDriveLength/2), new Translation2d(-kDriveWidth/2, -kDriveLength/2), new Translation2d(kDriveWidth/2, -kDriveLength/2));
+    public static final Port kGyroId = null;
     }
 }

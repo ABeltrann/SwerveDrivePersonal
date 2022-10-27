@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -31,9 +32,12 @@ public class SwerveModule {
  private final edu.wpi.first.wpilibj.AnalogInput absoluteEncoder;
  private final Boolean absoluteEncoderReversed;
  private final Double absoluteEncoderOffset;
+ private final PIDController turningPidController;
 
 
-  public SwerveModule(int turningMotorid, int fowardMotorid, int fowardEncoderID, int turningEncoderid, TalonFXInvertType dInvertType, boolean turningMotorInverted, Double absoluteEncoderOffset, boolean absoluteEncoderInverted, int absoluteEncoderID, String moduleIndentifier ) {
+  public SwerveModule(int turningMotorid, int fowardMotorid, int fowardEncoderID, 
+  int turningEncoderid, TalonFXInvertType dInvertType, boolean turningMotorInverted, 
+  Double absoluteEncoderOffset, boolean absoluteEncoderInverted, int absoluteEncoderID, String moduleIndentifier ) {
     fowardMotor = new TalonFX(fowardMotorid);
     turningMotor = new TalonFX(turningMotorid);
     turningMotor.setInverted(turningMotorInverted);
@@ -44,6 +48,7 @@ public class SwerveModule {
     absoluteEncoder = new edu.wpi.first.wpilibj.AnalogInput(absoluteEncoderID);
     this.absoluteEncoderReversed = absoluteEncoderReversed;
     this.absoluteEncoderOffset = absoluteEncoderOffset;
+    
 
     fowardEncoder = new CANCoder(fowardEncoderID);
     turningEncoder = new CANCoder(turningEncoderid);
@@ -60,8 +65,8 @@ public class SwerveModule {
     
 
 
-    PIDController turningController = new PIDController(Constants.SwerveModuleConstants.kPTurning, 0, 0);
-    turningController.enableContinuousInput(-Math.PI, Math.PI);
+    this.turningPidController = new PIDController(Constants.SwerveModuleConstants.kPTurning, 0, 0);
+    turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetEncoders();
 
@@ -69,17 +74,18 @@ public class SwerveModule {
   
   }
   public double getAbsoluteEncoder(){
-     double angle = absoluteEncoder.getVoltage()/ RobotController.getVoltage5V();
+     double angle = absoluteEncoder.getVoltage()/ 
+     RobotController.getVoltage5V();
      angle = angle * 2 * Math.PI;
      angle -= absoluteEncoderOffset;
-    return angle;
+    return angle * (absoluteEncoderReversed? -1.0: 1.0);
   }
 
-  public double getFowardEncoder(){
+  public double getFowardEncoderVelocity(){
     return fowardEncoder.getVelocity();
   }
 
-  public double getTurningEncoder(){
+  public double getTurningEncoderVelocity(){
     return turningEncoder.getVelocity();
   }
   public double getTurningPosition(){
@@ -96,8 +102,26 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getState(){
-    return new SwerveModuleState(getfo)
+    return new SwerveModuleState(getFowardEncoderVelocity(), 
+    new Rotation2d(getTurningEncoderVelocity()));
   }
+  public void setDesiredState (SwerveModuleState state){
+    if (Math.abs(state.speedMetersPerSecond) < .01){
+
+      stop();
+      return;
+    }
+    state = SwerveModuleState.optimize(state, getState().angle);
+    fowardMotor.set(ControlMode.PercentOutput, state.speedMetersPerSecond);
+    turningMotor.set(ControlMode.PercentOutput, turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+  }
+  public void stop(){
+    fowardMotor.set(ControlMode.PercentOutput, 0.0);
+    turningMotor.set(ControlMode.PercentOutput, 0.0);
+  }
+
+
+  
 
   
   }
