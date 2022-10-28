@@ -36,17 +36,17 @@ public class SwerveModule {
 
 
   public SwerveModule(int turningMotorid, int fowardMotorid, int fowardEncoderID, 
-  int turningEncoderid, TalonFXInvertType dInvertType, boolean turningMotorInverted, 
+  int turningEncoderid, boolean frontMotorInverted, boolean turningMotorInverted, 
   Double absoluteEncoderOffset, boolean absoluteEncoderInverted, int absoluteEncoderID, String moduleIndentifier ) {
     fowardMotor = new TalonFX(fowardMotorid);
     turningMotor = new TalonFX(turningMotorid);
     turningMotor.setInverted(turningMotorInverted);
-    fowardMotor.setInverted(dInvertType);
+    fowardMotor.setInverted(frontMotorInverted);
     
 
 
     absoluteEncoder = new edu.wpi.first.wpilibj.AnalogInput(absoluteEncoderID);
-    this.absoluteEncoderReversed = absoluteEncoderReversed;
+    this.absoluteEncoderReversed = absoluteEncoderInverted;
     this.absoluteEncoderOffset = absoluteEncoderOffset;
     
 
