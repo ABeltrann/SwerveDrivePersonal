@@ -27,7 +27,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     swerveSubsystem.setDefaultCommand(new FieldOrientatedSwerve(() -> xboxController.getLeftX(),
-    () -> xboxController.getLeftY(), ()->xboxController.getRightX(), swerveSubsystem)));
+    () -> xboxController.getLeftY(), ()->xboxController.getRightX(), swerveSubsystem));
 
 
     // Configure the button bindings

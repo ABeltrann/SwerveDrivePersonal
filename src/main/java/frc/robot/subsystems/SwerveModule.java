@@ -35,9 +35,19 @@ public class SwerveModule {
  private final PIDController turningPidController;
 
 
-  public SwerveModule(int turningMotorid, int fowardMotorid, int fowardEncoderID, 
-  int turningEncoderid, boolean frontMotorInverted, boolean turningMotorInverted, 
-  Double absoluteEncoderOffset, boolean absoluteEncoderInverted, int absoluteEncoderID, String moduleIndentifier ) {
+  public SwerveModule(
+  int turningMotorid,
+  int fowardMotorid, 
+  int fowardEncoderID, 
+  int turningEncoderid, 
+  boolean frontMotorInverted,
+  boolean turningMotorInverted, 
+  Double absoluteEncoderOffset, 
+  boolean absoluteEncoderInverted,
+  int absoluteEncoderID,
+  String moduleIndentifier)
+  
+  {
     fowardMotor = new TalonFX(fowardMotorid);
     turningMotor = new TalonFX(turningMotorid);
     turningMotor.setInverted(turningMotorInverted);
@@ -65,7 +75,13 @@ public class SwerveModule {
     
 
 
-    this.turningPidController = new PIDController(Constants.SwerveModuleConstants.kPTurning, 0, 0);
+    this.turningPidController = 
+    new PIDController(
+      SwerveModuleConstants.kPTurning, 
+      SwerveModuleConstants.kITurning, 
+      SwerveModuleConstants.KDTurning
+    );
+   
     turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetEncoders();
@@ -111,9 +127,16 @@ public class SwerveModule {
       stop();
       return;
     }
-    state = SwerveModuleState.optimize(state, getState().angle);
-    fowardMotor.set(ControlMode.PercentOutput, state.speedMetersPerSecond);
-    turningMotor.set(ControlMode.PercentOutput, turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+    state = 
+    SwerveModuleState.optimize(state, getState().angle);
+    
+    fowardMotor.set(ControlMode.PercentOutput, 
+    state.speedMetersPerSecond);
+
+    turningMotor.set(ControlMode.PercentOutput,
+     turningPidController.calculate(
+     getTurningPosition(), state.angle.getRadians()
+  ));
   }
   public void stop(){
     fowardMotor.set(ControlMode.PercentOutput, 0.0);

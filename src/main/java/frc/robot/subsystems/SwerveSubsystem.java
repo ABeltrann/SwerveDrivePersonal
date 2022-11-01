@@ -6,13 +6,17 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveSubsystemConstants;
@@ -20,7 +24,8 @@ import frc.robot.Constants.SwerveSubsystemConstants;
 public class SwerveSubsystem extends SubsystemBase {
   private  SwerveDriveOdometry odometry;
  private final AHRS NavX;
-private  Pose2d pose2d;
+private  Pose2d pose;
+private ChassisSpeeds chassisSpeeds;
  private final SwerveModule frontLeftModule = new SwerveModule(SwerveSubsystemConstants.kFrontLeftTurningID, SwerveSubsystemConstants.kFrontLeftFowardID, 
   SwerveSubsystemConstants.kFrontLeftFowardEncoderID, SwerveSubsystemConstants.kFrontLeftTurningEncoderID, SwerveSubsystemConstants.kFrontLeftFowardInverted , 
   SwerveSubsystemConstants.kFrontLeftTurningInverted, SwerveSubsystemConstants.kFrontLeftAbsoluteEncoderOffset, SwerveSubsystemConstants.kFrontLeftAbsoluteEncoderInverted, 
@@ -44,41 +49,86 @@ private  Pose2d pose2d;
   public SwerveSubsystem() {
   odometry = new SwerveDriveOdometry(SwerveSubsystemConstants.kDriveKinematics, new Rotation2d(0));
   NavX  = new AHRS(Constants.SwerveSubsystemConstants.kGyroId);
-  pose2d = new Pose2d();
+  pose = new Pose2d();
 
-
-  
-
-      
   }
 
   public Rotation2d getHeading(){
-   return Rotation2d.fromDegrees(NavX.getAngle());
+   return Rotation2d.fromDegrees(-NavX.getAngle());
   }
 
-  public void resetOdometry( Pose2d pose){
+  public void resetOdometry( Pose2d newPose){
     odometry.resetPosition(pose , getHeading());
+    pose = odometry.getPoseMeters();
+  }
+  public void calibrateGyro(){
+    if(DriverStation.isDisabled()){
+      NavX.calibrate();
+    }
   }
 
   @Override
   public void periodic() {
-    pose2d = odometry.update(getHeading(), frontLeftModule.getState(),frontRightModule.getState(),BackLeftModule.getState(), BackRightModule.getState() );
+    pose = odometry.update(
+      getHeading(), 
+      frontLeftModule.getState(),
+      frontRightModule.getState(),
+      BackLeftModule.getState(), 
+      BackRightModule.getState() 
+      );
 
     
 
   }
+  public enum driveMode{
+    DEFAULT,
+    FIELDCENTRICDRIVE
 
-  public void setSwerveModuleStates(SwerveModuleState[] states){
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kAbsoluteMaxSpeeds);
+  }
+  private driveMode mode = driveMode.FIELDCENTRICDRIVE;
+
+  public void setDriveMode(driveMode driveMode){
+    mode = driveMode;
+  }
+
+
+
+  public void setSwerveSpeeds(double xMetersPerSecond, double yMetersPerSecond, double thetaRadiansPerSecond){
+   if(mode == driveMode.FIELDCENTRICDRIVE){
+    SwerveModuleState[] states = SwerveSubsystemConstants.kDriveKinematics.toSwerveModuleStates
+    (ChassisSpeeds.fromFieldRelativeSpeeds(
+      xMetersPerSecond, 
+      yMetersPerSecond, 
+      thetaRadiansPerSecond,
+      pose.getRotation()
+   ));
+   SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kRelativeMaxSpeeds);
+   frontLeftModule.setDesiredState(states[0]);
+   frontRightModule.setDesiredState(states[1]);
+   frontRightModule.setDesiredState(states[2]);
+   frontRightModule.setDesiredState(states[3]);
+   } 
+   
+   else if(mode == driveMode.DEFAULT){
+    SwerveModuleState[] states = SwerveSubsystemConstants.kDriveKinematics.toSwerveModuleStates(
+      new ChassisSpeeds(
+      xMetersPerSecond, 
+      yMetersPerSecond,
+      thetaRadiansPerSecond
+    ));
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kRelativeMaxSpeeds);
     frontLeftModule.setDesiredState(states[0]);
     frontRightModule.setDesiredState(states[1]);
     frontRightModule.setDesiredState(states[2]);
     frontRightModule.setDesiredState(states[3]);
+   }
+  
+ 
 
-
-
-
+ 
   }
+
 
 
 }

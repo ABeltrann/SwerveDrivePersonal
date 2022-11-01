@@ -27,6 +27,8 @@ public final class Constants {
     public static final double kDriveEncoderMetersPerSecond = kDriveEncoder2Meter/60;
     public static final double kTurnEncoder2RadiansPerSecond = kTurnEncoder2Radians/60;
     public static final double kPTurning = .5;
+    public static final double kITurning = 0;
+    public static final double KDTurning = 0;
     }
     public static final class SwerveSubsystemConstants{
     
@@ -75,6 +77,6 @@ public final class Constants {
     public static final Double kBackRightAbsoluteEncoderOffset = null;
     public static final boolean kBackRightAbsoluteEncoderInverted = false;
     public static final int kBackRightAbsoluteEncoderID = 0;
-    public static final double kAbsoluteMaxSpeeds = 0;
+    public static final double kRelativeMaxSpeeds = 0;
     }
 }

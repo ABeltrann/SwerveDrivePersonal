@@ -46,14 +46,12 @@ public class FieldOrientatedSwerve extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ChassisSpeeds fieldChassisSpeeds;
+   
     double xValue = xValueSupplier.getAsDouble();
     double yValue = yValueSupplier.getAsDouble();
     double rotValue = rotValueSupplier.getAsDouble();
 
-     fieldChassisSpeeds =  ChassisSpeeds.fromFieldRelativeSpeeds(xValue, yValue, rotValue, swerveSubsystem.getHeading());
-    SwerveModuleState[] states = SwerveSubsystemConstants.kDriveKinematics.toSwerveModuleStates(fieldChassisSpeeds);
-    swerveSubsystem.setSwerveModuleStates(states );
+    swerveSubsystem.setSwerveSpeeds(xValue, yValue, rotValue);
   }
 
   // Called once the command ends or is interrupted.
