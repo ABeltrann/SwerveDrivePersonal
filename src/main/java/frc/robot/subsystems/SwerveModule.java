@@ -34,7 +34,7 @@ public class SwerveModule {
  private final Double absoluteEncoderOffset;
  private final PIDController turningPidController;
 
-
+  //constructor for each swerve
   public SwerveModule(
   int turningMotorid,
   int fowardMotorid, 
@@ -62,6 +62,7 @@ public class SwerveModule {
 
     fowardEncoder = new CANCoder(fowardEncoderID);
     turningEncoder = new CANCoder(turningEncoderid);
+    //Config to be expanded in the future(maybe own subystem)
     CANCoderConfiguration turningConfig = new CANCoderConfiguration();
     turningConfig.sensorCoefficient = SwerveModuleConstants.kTurnEncoder2Radians;
     turningConfig.sensorTimeBase = SensorTimeBase.PerSecond;
@@ -89,6 +90,7 @@ public class SwerveModule {
     
   
   }
+  //Absolute Encoder to be researched further
   public double getAbsoluteEncoder(){
      double angle = absoluteEncoder.getVoltage()/ 
      RobotController.getVoltage5V();
@@ -116,11 +118,12 @@ public class SwerveModule {
    turningEncoder.setPosition(getAbsoluteEncoder());
    fowardEncoder.setPosition(0);
   }
-
+ 
   public SwerveModuleState getState(){
     return new SwerveModuleState(getFowardEncoderVelocity(), 
     new Rotation2d(getTurningEncoderVelocity()));
   }
+  //takes in a state and sets each module to the state 
   public void setDesiredState (SwerveModuleState state){
     if (Math.abs(state.speedMetersPerSecond) < .01){
 
@@ -138,6 +141,7 @@ public class SwerveModule {
      getTurningPosition(), state.angle.getRadians()
   ));
   }
+  //stops all motors
   public void stop(){
     fowardMotor.set(ControlMode.PercentOutput, 0.0);
     turningMotor.set(ControlMode.PercentOutput, 0.0);

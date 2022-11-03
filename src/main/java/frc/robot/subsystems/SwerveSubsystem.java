@@ -52,7 +52,7 @@ private ChassisSpeeds chassisSpeeds;
   pose = new Pose2d();
 
   }
-
+  //Possible source of error
   public Rotation2d getHeading(){
    return Rotation2d.fromDegrees(-NavX.getAngle());
   }
@@ -69,6 +69,7 @@ private ChassisSpeeds chassisSpeeds;
 
   @Override
   public void periodic() {
+    //sets pose during periodic
     pose = odometry.update(
       getHeading(), 
       frontLeftModule.getState(),
@@ -80,6 +81,7 @@ private ChassisSpeeds chassisSpeeds;
     
 
   }
+  //drive mode selecter
   public enum driveMode{
     DEFAULT,
     FIELDCENTRICDRIVE
@@ -92,7 +94,7 @@ private ChassisSpeeds chassisSpeeds;
   }
 
 
-
+//field orientated drive
   public void setSwerveSpeeds(double xMetersPerSecond, double yMetersPerSecond, double thetaRadiansPerSecond){
    if(mode == driveMode.FIELDCENTRICDRIVE){
     SwerveModuleState[] states = SwerveSubsystemConstants.kDriveKinematics.toSwerveModuleStates
@@ -102,13 +104,14 @@ private ChassisSpeeds chassisSpeeds;
       thetaRadiansPerSecond,
       pose.getRotation()
    ));
+   //desaturates module speeds to have correct ratio
    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kRelativeMaxSpeeds);
    frontLeftModule.setDesiredState(states[0]);
    frontRightModule.setDesiredState(states[1]);
    frontRightModule.setDesiredState(states[2]);
    frontRightModule.setDesiredState(states[3]);
    } 
-   
+   //robot orientated drive
    else if(mode == driveMode.DEFAULT){
     SwerveModuleState[] states = SwerveSubsystemConstants.kDriveKinematics.toSwerveModuleStates(
       new ChassisSpeeds(

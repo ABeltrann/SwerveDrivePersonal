@@ -7,9 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.CalibrateGyroCmd;
 import frc.robot.commands.FieldOrientatedSwerve;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,11 +24,14 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final XboxController xboxController = new XboxController(0);
+  private final CalibrateGyroCmd calibrateGyroCmd = new CalibrateGyroCmd(swerveSubsystem);
  
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    new JoystickButton(xboxController, XboxController.Button.kA.value).whenPressed(calibrateGyroCmd);
+    
     swerveSubsystem.setDefaultCommand(new FieldOrientatedSwerve(() -> xboxController.getLeftX(),
     () -> xboxController.getLeftY(), ()->xboxController.getRightX(), swerveSubsystem));
 
