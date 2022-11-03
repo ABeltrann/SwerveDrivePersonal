@@ -48,6 +48,7 @@ public class SwerveModule {
   String moduleIndentifier)
   
   {
+    //Inversion might be wrong, different for Falcons
     fowardMotor = new TalonFX(fowardMotorid);
     turningMotor = new TalonFX(turningMotorid);
     turningMotor.setInverted(turningMotorInverted);
