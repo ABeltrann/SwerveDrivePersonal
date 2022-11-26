@@ -12,6 +12,7 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.AnalogInput;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,8 +26,8 @@ import frc.robot.Constants.SwerveModuleConstants;
 
 public class SwerveModule {
   /** Creates a new SwerveModule. */
- private final TalonFX fowardMotor;
- private final TalonFX turningMotor;
+ private final CANSparkMax fowardMotor;
+ private final CANSparkMax turningMotor;
  private final CANCoder fowardEncoder;
  private final CANCoder turningEncoder;
  private final edu.wpi.first.wpilibj.AnalogInput absoluteEncoder;
@@ -48,8 +49,8 @@ public class SwerveModule {
   String moduleIndentifier)
   
   {
-    fowardMotor = new TalonFX(fowardMotorid);
-    turningMotor = new TalonFX(turningMotorid);
+    fowardMotor = new CANSparkMax(fowardMotorid, MotorType.kBrushless);
+    turningMotor = new CANSparkMax(turningMotorid, MotorType.kBrushless);
     turningMotor.setInverted(turningMotorInverted);
     fowardMotor.setInverted(frontMotorInverted);
     
@@ -133,18 +134,18 @@ public class SwerveModule {
     state = 
     SwerveModuleState.optimize(state, getState().angle);
     
-    fowardMotor.set(ControlMode.PercentOutput, 
-    state.speedMetersPerSecond);
+    fowardMotor.set(
+    state.speedMetersPerSecond/SwerveModuleConstants.KFfowardspeed);
 
-    turningMotor.set(ControlMode.PercentOutput,
+    turningMotor.set(
      turningPidController.calculate(
      getTurningPosition(), state.angle.getRadians()
   ));
   }
   //stops all motors
   public void stop(){
-    fowardMotor.set(ControlMode.PercentOutput, 0.0);
-    turningMotor.set(ControlMode.PercentOutput, 0.0);
+    fowardMotor.set( 0.0);
+    turningMotor.set( 0.0);
   }
 
 

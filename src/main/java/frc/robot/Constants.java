@@ -24,6 +24,7 @@ public final class Constants {
     public static final double kPTurning = 0;
     public static final double kITurning = 0;
     public static final double KDTurning = 0;
+    public static final double KFfowardspeed = 0;
     }
     public static final class SwerveSubsystemConstants{
     //measurements of the width & length between each wheel
