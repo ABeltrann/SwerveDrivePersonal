@@ -12,6 +12,7 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.AnalogInput;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,11 +23,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.Constants.SwerveSubsystemConstants;
 
 public class SwerveModule {
   /** Creates a new SwerveModule. */
- private final TalonFX fowardMotor;
- private final TalonFX turningMotor;
+ private final CANSparkMax fowardMotor;
+ private final CANSparkMax turningMotor;
  private final CANCoder fowardEncoder;
  private final CANCoder turningEncoder;
  private final edu.wpi.first.wpilibj.AnalogInput absoluteEncoder;
@@ -49,8 +51,8 @@ public class SwerveModule {
   
   {
     //Inversion might be wrong, different for Falcons
-    fowardMotor = new TalonFX(fowardMotorid);
-    turningMotor = new TalonFX(turningMotorid);
+    fowardMotor = new CANSparkMax(fowardMotorid, MotorType.kBrushless);
+    turningMotor = new CANSparkMax(turningMotorid, MotorType.kBrushless);
     turningMotor.setInverted(turningMotorInverted);
     fowardMotor.setInverted(frontMotorInverted);
     
@@ -120,7 +122,7 @@ public class SwerveModule {
 
   public SwerveModuleState getState(){
     return new SwerveModuleState(getFowardEncoderVelocity(), 
-    new Rotation2d(getTurningEncoderVelocity()));
+    new Rotation2d(getTurningPosition()));
   }
   public void setDesiredState (SwerveModuleState state){
     if (Math.abs(state.speedMetersPerSecond) < .01){
@@ -131,17 +133,17 @@ public class SwerveModule {
     state = 
     SwerveModuleState.optimize(state, getState().angle);
     
-    fowardMotor.set(ControlMode.PercentOutput, 
-    state.speedMetersPerSecond);
+    fowardMotor.set( 
+    state.speedMetersPerSecond/SwerveSubsystemConstants.kRelativeMaxSpeeds);
 
-    turningMotor.set(ControlMode.PercentOutput,
+    turningMotor.set(
      turningPidController.calculate(
      getTurningPosition(), state.angle.getRadians()
   ));
   }
   public void stop(){
-    fowardMotor.set(ControlMode.PercentOutput, 0.0);
-    turningMotor.set(ControlMode.PercentOutput, 0.0);
+    fowardMotor.set(0.0);
+    turningMotor.set(0.0);
   }
 
 

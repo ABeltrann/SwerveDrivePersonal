@@ -77,6 +77,7 @@ public final class Constants {
     public static final Double kBackRightAbsoluteEncoderOffset = null;
     public static final boolean kBackRightAbsoluteEncoderInverted = false;
     public static final int kBackRightAbsoluteEncoderID = 0;
+    public static final double kAbsolutueMaxSpeeds = 0;
     public static final double kRelativeMaxSpeeds = 0;
     }
 }

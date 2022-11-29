@@ -51,7 +51,7 @@ public class FieldOrientatedSwerve extends CommandBase {
     double yValue = yValueSupplier.getAsDouble();
     double rotValue = rotValueSupplier.getAsDouble();
 
-    swerveSubsystem.setSwerveSpeeds(xValue, yValue, rotValue);
+    swerveSubsystem.setSwerveSpeeds(xValue*SwerveSubsystemConstants.kRelativeMaxSpeeds ,yValue*SwerveSubsystemConstants.kRelativeMaxSpeeds, rotValue*SwerveSubsystemConstants.kRelativeMaxSpeeds);
   }
 
   // Called once the command ends or is interrupted.

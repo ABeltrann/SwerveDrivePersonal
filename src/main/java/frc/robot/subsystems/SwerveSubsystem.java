@@ -102,7 +102,7 @@ private ChassisSpeeds chassisSpeeds;
       thetaRadiansPerSecond,
       pose.getRotation()
    ));
-   SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kRelativeMaxSpeeds);
+   SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kAbsolutueMaxSpeeds);
    frontLeftModule.setDesiredState(states[0]);
    frontRightModule.setDesiredState(states[1]);
    frontRightModule.setDesiredState(states[2]);
@@ -117,7 +117,7 @@ private ChassisSpeeds chassisSpeeds;
       thetaRadiansPerSecond
     ));
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kRelativeMaxSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveSubsystemConstants.kAbsolutueMaxSpeeds);
     frontLeftModule.setDesiredState(states[0]);
     frontRightModule.setDesiredState(states[1]);
     frontRightModule.setDesiredState(states[2]);
